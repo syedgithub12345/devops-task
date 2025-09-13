@@ -29,6 +29,11 @@ app.post('/github-webhook', (req, res) => {
   res.status(200).send('OK'); // Respond with 200 to GitHub
 });
 
+// Optional: handle GET requests to /github-webhook (GitHub sometimes tries GET)
+app.get('/github-webhook', (req, res) => {
+  res.status(200).send('Webhook endpoint, use POST.');
+});
+
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
 });
