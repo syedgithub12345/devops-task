@@ -1,29 +1,61 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_HUB_USER = 'syedsafi'
-        IMAGE_NAME = 'devops-task'
+        IMAGE_NAME = "syedsafi/devops-task"
+        TAG = "${env.BUILD_NUMBER}"
     }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
+                echo "Checking out code..."
+                checkout scm
+            }
+        }
+
+        stage('Install & Test') {
+            steps {
+                echo "Installing dependencies and running tests..."
                 bat 'npm ci'
                 bat 'npm test'
             }
         }
-        stage('Dockerize') {
+
+        stage('Docker Build') {
             steps {
-                bat "docker build -t %DOCKER_HUB_USER%/%IMAGE_NAME%:latest ."
+                echo "Building Docker image..."
+                bat "docker build -t %IMAGE_NAME%:%TAG% ."
             }
         }
-        stage('Push to Registry') {
+
+        stage('Docker Login & Push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    bat 'echo %PASSWORD% | docker login -u %USERNAME% --password-stdin'
-                    bat "docker push %DOCKER_HUB_USER%/%IMAGE_NAME%:latest"
+                echo "Logging in and pushing to DockerHub..."
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                    bat "docker push %IMAGE_NAME%:%TAG%"
                 }
             }
         }
-        // Next stage will be ECS/GKE deploy — we’ll add this later
+
+        stage('Deploy (placeholder)') {
+            steps {
+                echo "Deploy to AWS/GCP will be added here later"
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Cleaning up local image"
+            bat "docker rmi %IMAGE_NAME%:%TAG% || echo image not found"
+        }
+        success {
+            echo "Build succeeded: ${env.BUILD_URL}"
+        }
+        failure {
+            echo "Build failed - check logs"
+        }
     }
 }
