@@ -37,7 +37,7 @@ Set up a complete CI/CD pipeline for a sample Node.js application using GitHub, 
    - Pushed all updated files (Dockerfile, Jenkinsfile, etc.) to `dev` branch.
    - Merged into `main` for deployment.
 
-📸 **Screenshots 
+📸 **Screenshots**
 <img width="1638" height="943" alt="Screenshot 2025-09-14 135748" src="https://github.com/user-attachments/assets/04fbcfc7-2d8f-4083-a95b-b78e0ef19a70" />
 <img width="232" height="244" alt="Screenshot 2025-09-14 135848" src="https://github.com/user-attachments/assets/7bbf9081-2463-41bc-a04d-f1e45bca3cff" />
 
